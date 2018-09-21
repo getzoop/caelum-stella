@@ -3,7 +3,7 @@
   <groupId>br.com.caelum.stella</groupId>
   <artifactId>caelum-stella</artifactId>
   <packaging>pom</packaging>
-  <version>2.1.4-SNAPSHOT</version>
+  <version>zoop-boleto</version>
   <name>Caelum Stella</name>
   <description>
     Caelum Stella is a set of validators, formatters and converters
@@ -29,17 +29,17 @@
   
   <modules>
     <module>stella-core</module>
-    <module>stella-bean-validation</module>
-    <module>stella-hibernate-user-types</module>
-    <module>stella-faces</module>
+    <!--<module>stella-bean-validation</module>-->
+    <!--<module>stella-hibernate-user-types</module>-->
+    <!--<module>stella-faces</module>-->
     <module>stella-boleto</module>
-    <module>stella-frete</module>
+    <!--<module>stella-frete</module>-->
 <!--    <module>stella-feriado</module> -->
 <!--     <module>stella-distribution</module> -->
-    <module>examples/faces-example-1x</module>
-    <module>examples/faces-example-2x</module>
-    <module>examples/hibernate-persistence-example</module>
-    <module>examples/vraptor-validator-example</module>
+    <!--<module>examples/faces-example-1x</module>-->
+    <!--<module>examples/faces-example-2x</module>-->
+    <!--<module>examples/hibernate-persistence-example</module>-->
+    <!--<module>examples/vraptor-validator-example</module>-->
     <!--
     <module>examples/boleto-example</module>
     <module>examples/core-example</module>
@@ -107,8 +107,8 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
+            <source>1.8</source>
+            <target>1.8</target>
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>

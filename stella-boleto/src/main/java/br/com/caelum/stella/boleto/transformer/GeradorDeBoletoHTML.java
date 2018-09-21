@@ -1,21 +1,24 @@
 package br.com.caelum.stella.boleto.transformer;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.Writer;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import br.com.caelum.stella.boleto.Boleto;
+import br.com.caelum.stella.boleto.exception.GeracaoBoletoException;
+import com.lowagie.text.pdf.codec.Base64;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.HtmlExporter;
+import net.sf.jasperreports.engine.export.HtmlResourceHandler;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.j2ee.servlets.ImageServlet;
-import br.com.caelum.stella.boleto.Boleto;
-import br.com.caelum.stella.boleto.exception.GeracaoBoletoException;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Gerador de boletos em HTML
@@ -26,11 +29,10 @@ import br.com.caelum.stella.boleto.exception.GeracaoBoletoException;
 @SuppressWarnings("deprecation")
 public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 	
-	private JRHtmlExporter exporter = new JRHtmlExporter();
+	private HtmlExporter exporter = new HtmlExporter();
 
 	{
 		exporter.setParameter(JRHtmlExporterParameter.CHARACTER_ENCODING, "ISO-8859-1");
-		exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
 		exporter.setParameter(JRHtmlExporterParameter.ZOOM_RATIO, 1.3F);
 		exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "stella-boleto?image=");
 		exporter.setParameter(JRHtmlExporterParameter.CHARACTER_ENCODING, "ISO-8859-1");
@@ -79,6 +81,46 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 		}
 	}
 
+    /**
+     * @return bytearray do relatório
+     */
+	public byte[] geraHTML() {
+        Map<String, String> images = new HashMap<>();
+
+        HtmlExporter exporter = new HtmlExporter();
+        exporter.setExporterInput(new SimpleExporterInput(geraRelatorio()));
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        SimpleHtmlExporterOutput simpleHtmlExporterOutput = new SimpleHtmlExporterOutput(outputStream);
+        simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
+            @Override
+            public void handleResource(String id, byte[] data) {
+                final ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                final String mimeType;
+                try {
+                    mimeType = URLConnection.guessContentTypeFromStream(bis);
+                    final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
+                    images.put(id, base64Data);
+                } catch (IOException ignored) { }
+            }
+
+            @Override
+            public String getResourcePath(String id) {
+                return images.get(id);
+            }
+        });
+        exporter.setExporterOutput(simpleHtmlExporterOutput);
+
+        try {
+            exporter.exportReport();
+        } catch (JRException e) {
+            throw new GeracaoBoletoException(e);
+        }
+
+        return outputStream.toByteArray();
+    }
+
 	/**
 	 * Gera um boleto em HTML, e grava no caminho informado.
 	 * 
@@ -96,7 +138,7 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 	 */
 	public void geraHTML(Writer writer, HttpServletRequest request) {
 		try {
-			JRHtmlExporter exporter = getHtmlExporter(request);
+			HtmlExporter exporter = getHtmlExporter(request);
 			exporter.setParameter(JRHtmlExporterParameter.OUTPUT_WRITER, writer);
 			exporter.exportReport();	
 		} catch (JRException e) {
@@ -110,7 +152,7 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 	 * @param request requisição.
 	 * @return exporter do Jasper configurado.
 	 */
-	protected JRHtmlExporter getHtmlExporter(HttpServletRequest request) {
+	private HtmlExporter getHtmlExporter(HttpServletRequest request) {
 		JasperPrint relatorio = geraRelatorio();
 
 		exporter.setParameter(JRHtmlExporterParameter.JASPER_PRINT, relatorio);

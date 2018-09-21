@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>br.com.caelum.stella</groupId>
 		<artifactId>caelum-stella</artifactId>
-		<version>2.1.4-SNAPSHOT</version>
+		<version>zoop-boleto</version>
 	</parent>
 
 	<artifactId>caelum-stella-boleto</artifactId>
@@ -16,13 +16,13 @@
 		<dependency>
 			<groupId>br.com.caelum.stella</groupId>
 			<artifactId>caelum-stella-core</artifactId>
-			<version>2.1.4-SNAPSHOT</version>
+			<version>zoop-boleto</version>
 		</dependency>
 
 	    <dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>5.5.0</version>
+			<version>6.6.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jfree</groupId>
@@ -145,7 +145,7 @@
 						<dependency>
 							<groupId>net.sf.jasperreports</groupId>
 							<artifactId>jasperreports</artifactId>
-							<version>5.5.0</version>
+							<version>6.6.0</version>
 						</dependency>
 						<dependency>
 							<groupId>org.mortbay.jetty</groupId>
