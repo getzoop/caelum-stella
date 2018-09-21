@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.HtmlExporter;
 import net.sf.jasperreports.engine.export.HtmlResourceHandler;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.j2ee.servlets.ImageServlet;
 
@@ -83,10 +84,11 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
     /**
      * @return bytearray do relatório
      */
-	public byte[] geraHtml() {
+	public byte[] geraHTML() {
         Map<String, String> images = new HashMap<>();
 
-        HtmlExporter exporter = getHtmlExporter();
+        HtmlExporter exporter = new HtmlExporter();
+        exporter.setExporterInput(new SimpleExporterInput(geraRelatorio()));
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -143,14 +145,6 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 			throw new GeracaoBoletoException(e);
 		}
 	}
-
-	private HtmlExporter getHtmlExporter() {
-        JasperPrint relatorio = geraRelatorio();
-
-        exporter.setParameter(JRExporterParameter.JASPER_PRINT, relatorio);
-
-        return exporter;
-    }
 
 	/**
 	 * Obtém o JRExporter para HTML. 
