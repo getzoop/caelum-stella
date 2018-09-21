@@ -80,6 +80,45 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 		}
 	}
 
+    /**
+     * @return bytearray do relatório
+     */
+	public byte[] geraHtml() {
+        Map<String, String> images = new HashMap<>();
+
+        HtmlExporter exporter = getHtmlExporter();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        SimpleHtmlExporterOutput simpleHtmlExporterOutput = new SimpleHtmlExporterOutput(outputStream);
+        simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
+            @Override
+            public void handleResource(String id, byte[] data) {
+                final ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                final String mimeType;
+                try {
+                    mimeType = URLConnection.guessContentTypeFromStream(bis);
+                    final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
+                    images.put(id, base64Data);
+                } catch (IOException ignored) { }
+            }
+
+            @Override
+            public String getResourcePath(String id) {
+                return images.get(id);
+            }
+        });
+        exporter.setExporterOutput(simpleHtmlExporterOutput);
+
+        try {
+            exporter.exportReport();
+        } catch (JRException e) {
+            throw new GeracaoBoletoException(e);
+        }
+
+        return outputStream.toByteArray();
+    }
+
 	/**
 	 * Gera um boleto em HTML, e grava no caminho informado.
 	 * 
@@ -97,29 +136,7 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 	 */
 	public void geraHTML(Writer writer, HttpServletRequest request) {
 		try {
-            Map<String, String> images = new HashMap<>();
-
-            HtmlExporter exporter = getHtmlExporter(request);
-
-            SimpleHtmlExporterOutput simpleHtmlExporterOutput = new SimpleHtmlExporterOutput(writer);
-            simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
-                @Override
-                public void handleResource(String id, byte[] data) {
-                    final ByteArrayInputStream bis = new ByteArrayInputStream(data);
-                    final String mimeType;
-                    try {
-                        mimeType = URLConnection.guessContentTypeFromStream(bis);
-                        final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
-                        images.put(id, base64Data);
-                    } catch (IOException ignored) { }
-                }
-
-                @Override
-                public String getResourcePath(String id) {
-                    return images.get(id);
-                }
-            });
-            exporter.setExporterOutput(simpleHtmlExporterOutput);
+			HtmlExporter exporter = getHtmlExporter(request);
 			exporter.setParameter(JRHtmlExporterParameter.OUTPUT_WRITER, writer);
 			exporter.exportReport();	
 		} catch (JRException e) {
@@ -127,13 +144,21 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
 		}
 	}
 
+	private HtmlExporter getHtmlExporter() {
+        JasperPrint relatorio = geraRelatorio();
+
+        exporter.setParameter(JRExporterParameter.JASPER_PRINT, relatorio);
+
+        return exporter;
+    }
+
 	/**
 	 * Obtém o JRExporter para HTML. 
 	 * 
 	 * @param request requisição.
 	 * @return exporter do Jasper configurado.
 	 */
-	protected HtmlExporter getHtmlExporter(HttpServletRequest request) {
+	private HtmlExporter getHtmlExporter(HttpServletRequest request) {
 		JasperPrint relatorio = geraRelatorio();
 
 		exporter.setParameter(JRHtmlExporterParameter.JASPER_PRINT, relatorio);
