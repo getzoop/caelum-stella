@@ -62,6 +62,13 @@
 			<version>1.5-beta1</version>
 		</dependency>
 
+		<!-- IText -->
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+
 		<!-- Testes do PDF -->
 		<dependency>
 			<groupId>pdfbox</groupId>
