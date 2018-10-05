@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.export.HtmlResourceHandler;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.export.SimpleHtmlReportConfiguration;
 import net.sf.jasperreports.j2ee.servlets.ImageServlet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -110,6 +111,11 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
                 return images.get(id);
             }
         });
+
+		SimpleHtmlReportConfiguration configuration = new SimpleHtmlReportConfiguration();
+		configuration.setZoomRatio(1.5F);
+
+		exporter.setConfiguration(configuration);
         exporter.setExporterOutput(simpleHtmlExporterOutput);
 
         try {
