@@ -2,22 +2,22 @@ package br.com.caelum.stella.boleto.transformer;
 
 import br.com.caelum.stella.boleto.Boleto;
 import br.com.caelum.stella.boleto.exception.GeracaoBoletoException;
-import com.lowagie.text.pdf.codec.Base64;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.HtmlExporter;
-import net.sf.jasperreports.engine.export.HtmlResourceHandler;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.export.SimpleHtmlReportConfiguration;
 import net.sf.jasperreports.j2ee.servlets.ImageServlet;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.URLConnection;
-import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -85,32 +85,17 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
      * @return bytearray do relatório
      */
 	public byte[] geraHTML() {
-        Map<String, String> images = new HashMap<>();
-
         HtmlExporter exporter = new HtmlExporter();
         exporter.setExporterInput(new SimpleExporterInput(geraRelatorio()));
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        SimpleHtmlExporterOutput simpleHtmlExporterOutput = new SimpleHtmlExporterOutput(outputStream);
-        simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
-            @Override
-            public void handleResource(String id, byte[] data) {
-                final ByteArrayInputStream bis = new ByteArrayInputStream(data);
-                final String mimeType;
-                try {
-                    mimeType = URLConnection.guessContentTypeFromStream(bis);
-                    final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
-                    images.put(id, base64Data);
-                } catch (IOException ignored) { }
-            }
+        SimpleHtmlReportConfiguration configuration = new SimpleHtmlReportConfiguration();
+		configuration.setZoomRatio(1.5F);
+		configuration.setEmbedImage(true);
 
-            @Override
-            public String getResourcePath(String id) {
-                return images.get(id);
-            }
-        });
-        exporter.setExporterOutput(simpleHtmlExporterOutput);
+		exporter.setConfiguration(configuration);
+        exporter.setExporterOutput(new SimpleHtmlExporterOutput(outputStream));
 
         try {
             exporter.exportReport();
