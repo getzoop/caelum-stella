@@ -94,26 +94,28 @@ public class GeradorDeBoletoHTML extends GeradorDeBoleto {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         SimpleHtmlExporterOutput simpleHtmlExporterOutput = new SimpleHtmlExporterOutput(outputStream);
-        simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
-            @Override
-            public void handleResource(String id, byte[] data) {
-                final ByteArrayInputStream bis = new ByteArrayInputStream(data);
-                final String mimeType;
-                try {
-                    mimeType = URLConnection.guessContentTypeFromStream(bis);
-                    final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
-                    images.put(id, base64Data);
-                } catch (IOException ignored) { }
-            }
-
-            @Override
-            public String getResourcePath(String id) {
-                return images.get(id);
-            }
-        });
+//        simpleHtmlExporterOutput.setImageHandler(new HtmlResourceHandler() {
+//            @Override
+//            public void handleResource(String id, byte[] data) {
+//                final ByteArrayInputStream bis = new ByteArrayInputStream(data);
+//                final String mimeType;
+//                try {
+//                    mimeType = URLConnection.guessContentTypeFromStream(bis);
+//                    final String base64Data = "data:" + mimeType + ";base64," + Base64.encodeBytes(data);
+//                    images.put(id, base64Data);
+//                } catch (IOException ignored) { }
+//            }
+//
+//            @Override
+//            public String getResourcePath(String id) {
+//                return images.get(id);
+//            }
+//        });
 
 		SimpleHtmlReportConfiguration configuration = new SimpleHtmlReportConfiguration();
 		configuration.setZoomRatio(1.5F);
+		configuration.setEmbedImage(true);
+		configuration.setIgnorePageMargins(true);
 
 		exporter.setConfiguration(configuration);
         exporter.setExporterOutput(simpleHtmlExporterOutput);
