@@ -3,7 +3,7 @@
   <parent>
     <groupId>br.com.caelum.stella</groupId>
     <artifactId>caelum-stella</artifactId>
-    <version>zoop-boleto</version>
+    <version>zoop-boleto-1.2</version>
   </parent>
   <artifactId>caelum-stella-core</artifactId>
   <packaging>jar</packaging>
